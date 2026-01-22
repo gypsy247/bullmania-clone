@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bullmania Clone</title>
+    <style>
+        :root {
+            --bg-color: #0d0d12;
+            --card-bg: #15151e;
+            --text-main: #ffffff;
+            --text-muted: #8b8b9e;
+            --accent-green: #00ffa3;
+            --accent-red: #ff0055;
+            --highlight: #6c5ce7;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 40px;
+        }
+
+        h1 { margin-bottom: 20px; font-weight: 300; letter-spacing: 1px; }
+        .logo { color: var(--highlight); font-weight: bold; }
+
+        /* Dashboard Container */
+        .dashboard {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* Header Stats */
+        .header-stats {
+            display: flex;
+            padding: 20px 40px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            gap: 40px;
+        }
+        .stat-box .label { color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-box .value { font-size: 1.5rem; font-weight: bold; margin-top: 5px; }
+
+        /* Table */
+        table { width: 100%; border-collapse: collapse; }
+        th { 
+            text-align: left; 
+            padding: 20px; 
+            color: var(--text-muted); 
+            font-size: 0.9rem; 
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        td { padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.02); }
+        tr:hover { background-color: rgba(255,255,255,0.02); }
+
+        /* Pills and Badges */
+        .trend-badge {
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: inline-block;
+            min-width: 80px;
+            text-align: center;
+        }
+        .trend-bullish { background: rgba(0, 255, 163, 0.1); color: var(--accent-green); border: 1px solid rgba(0, 255, 163, 0.2); }
+        .trend-bearish { background: rgba(255, 0, 85, 0.1); color: var(--accent-red); border: 1px solid rgba(255, 0, 85, 0.2); }
+
+        .pct-positive { color: var(--accent-green); }
+        .pct-negative { color: var(--accent-red); }
+
+        .token-info { display: flex; align-items: center; gap: 10px; font-weight: bold;}
+        .token-icon { width: 32px; height: 32px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px;}
+    </style>
+</head>
+<body>
+
+    <div class="dashboard">
+        <div class="header-stats">
+            <div class="stat-box">
+                <div class="label">Total Market Cap</div>
+                <div class="value">$2.45T</div>
+            </div>
+            <div class="stat-box">
+                <div class="label">BULLISH Coins</div>
+                <div class="value" style="color: var(--accent-green)">14</div>
+            </div>
+            <div class="stat-box">
+                <div class="label">BEARISH Coins</div>
+                <div class="value" style="color: var(--accent-red)">3</div>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Token</th>
+                    <th>Trend</th>
+                    <th>Price Change Since Flip</th>
+                    <th>Time Since Flip</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                </tbody>
+        </table>
+    </div>
+
+    <script src="dashboard_data.js"></script>
+
+    <script>
+        // If Python hasn't run yet, use this dummy data so the user sees something
+        if (typeof stockData === 'undefined') {
+            var stockData = [
+                { token: "WAITING...", trend: "LOADING", pct_change: 0, days_since_flip: 0, price: 0 },
+            ];
+        }
+
+        const tbody = document.getElementById('table-body');
+
+        stockData.forEach(coin => {
+            const isBullish = coin.trend === "BULLISH";
+            const trendClass = isBullish ? "trend-bullish" : "trend-bearish";
+            const pctClass = coin.pct_change >= 0 ? "pct-positive" : "pct-negative";
+            const arrow = isBullish ? "↑" : "↓";
+
+            const row = `
+                <tr>
+                    <td>
+                        <div class="token-info">
+                            <div class="token-icon">${coin.token[0]}</div>
+                            ${coin.token}
+                        </div>
+                    </td>
+                    <td><span class="trend-badge ${trendClass}">${arrow} ${coin.trend}</span></td>
+                    <td class="${pctClass}">${coin.pct_change}%</td>
+                    <td style="color: var(--text-muted)">${coin.days_since_flip} days ago</td>
+                    <td>$${coin.price.toLocaleString()}</td>
+                </tr>
+            `;
+            tbody.innerHTML += row;
+        });
+    </script>
+</body>
+</html>
